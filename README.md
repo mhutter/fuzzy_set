@@ -26,8 +26,7 @@ Or install it yourself as:
 require 'fuzzy_set'
 
 states = open('states.txt').read.split(/\n/)
-fs = FuzzySet.new
-fs.add(states)
+fs = FuzzySet.new(*states)
 
 fs.exact_match('michigan!') # => "Michigan"
 fs.exact_match('mischigen') # => nil
