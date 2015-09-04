@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Manuel Hutter']
   spec.email         = ['manuel@hutter.io']
 
-  spec.summary       = %q{FuzzySet allows you to fuzzy-search Strings!}
-  spec.description   = %q{FuzzySet allows you to fuzzy-search Strings!}
+  spec.summary       = %q{Set which allows you to fuzzy-search Strings}
+  spec.description   = %q{FuzzySet represents a set which allows searching its entries by using [Approximate string matching](https://en.wikipedia.org/wiki/Approximate_string_matching).}
   spec.homepage      = 'https://github.com/mhutter/fuzzy_set'
   spec.license       = 'MIT'
 
