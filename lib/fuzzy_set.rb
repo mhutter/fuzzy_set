@@ -9,10 +9,12 @@ require 'core_ext/string'
 class FuzzySet
   NGRAM_SIZE = 3
 
-  def initialize
+  def initialize(*items)
     @items = []
     @denormalize = {}
     @index = {}
+
+    add(*items)
   end
 
   # Normalizes +query+, and looks up an entry by its normalized value.
@@ -75,6 +77,11 @@ class FuzzySet
     @items.length
   end
   alias_method :size, :length
+
+  # @return [Boolean] +true+, if there are no items yet.
+  def empty?
+    @items.empty?
+  end
 
   private
 

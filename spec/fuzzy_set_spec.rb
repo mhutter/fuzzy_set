@@ -5,6 +5,12 @@ RSpec.describe FuzzySet do
     expect(FuzzySet::VERSION).to_not be_nil
   end
 
+  it '#new takes initial elements' do
+    set = FuzzySet.new('foo', 'bar')
+    expect(set).to_not be_empty
+    expect(set.length).to eq 2
+  end
+
   context '#add' do
     it 'adds single items' do
       %w(foo bar baz).each do |word|
@@ -82,6 +88,12 @@ RSpec.describe FuzzySet do
       fs.add('foo')
       expect(fs).to_not include 'bar'
     end
+  end
+
+  it '#empty? tells whether or not it has items' do
+    expect(fs).to be_empty
+    fs.add 'item'
+    expect(fs).to_not be_empty
   end
 
   context '#length' do
