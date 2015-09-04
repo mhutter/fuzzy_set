@@ -22,7 +22,19 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'fuzzy_set'
+
+states = open('states.txt').read.split(/\n/)
+fs = FuzzySet.new
+fs.add(states)
+
+fs.exact_match('michigan!') # => "Michigan"
+fs.exact_match('mischigen') # => nil
+
+fs.get('mischigen')
+# => ["Michigan", "Wisconsin", "Mississippi", "Minnesota", "Missouri"]
+```
 
 ## Development
 

@@ -1,20 +1,11 @@
+require 'string/similarity'
+
 require 'fuzzy_set/version'
 require 'core_ext/string'
 
 # FuzzySet implements a fuzzy-searchable set of strings.
 #
 # As a set, it cannot contain duplicate elements.
-#
-# @example
-#     states = open('states.txt').read.split(/\n/)
-#     fs = FuzzySet.new
-#     fs.add(states)
-#
-#     fs.exact_match('michigan!') # => "Michigan"
-#     fs.exact_match('mischigen') # => nil
-#
-#     fs.get('mischigen')
-#     # => ["Michigan", "Minnesota", "Mississippi", "Missouri", "Wisconsin"]
 class FuzzySet
   NGRAM_SIZE = 3
 
@@ -54,14 +45,24 @@ class FuzzySet
     add(item)
   end
 
+  # Fuzzy-find a string based on +query+
+  #
+  # 1. normalize +query+
+  # 2. check for an exact match and return, if present
+  # 3. find matches based on Ngrams
+  # 4. sort matches by their cosine similarity to +query+
   def get(query)
     query = normalize(query)
 
     # check for exact match
     return [@denormalize[query]] if @denormalize[query]
+
     match_ids = query.ngram(NGRAM_SIZE).map { |ng| @index[ng] }
     match_ids = match_ids.flatten.compact.uniq
-    match_ids.map { |id| @items[id] }
+    matches = match_ids.map { |id| @items[id] }
+
+    # sort matches by their cosine distance to query
+    matches.sort_by { |match| 1.0 - String::Similarity.cosine(query, match) }
   end
 
   # @return [Boolean] +true+ if the given +item+ is present in the set.
