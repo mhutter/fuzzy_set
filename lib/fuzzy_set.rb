@@ -42,15 +42,9 @@ class FuzzySet
     items.each do |item|
       item = item.to_s
       return self if @items.include?(item)
-      @items.push(item)
-      id = @items.index(item)
-      normalized = normalize(item)
-      @denormalize[normalized] = item
 
-      # ... calculate ngrams!
-      normalized.ngram(NGRAM_SIZE).each do |gram|
-        @index[gram] = (@index[gram] || []).push(id)
-      end
+      id = _add(item)
+      calculate_grams_for(normalize(item), id)
     end
     self
   end
@@ -79,7 +73,7 @@ class FuzzySet
   def length
     @items.length
   end
-  alias :size :length
+  alias_method :size, :length
 
   private
 
@@ -87,5 +81,18 @@ class FuzzySet
   # except spaces and then converting it to lowercase.
   def normalize(str)
     str.gsub(/[^\w ]/, '').downcase
+  end
+
+  def _add(item)
+    @items.push(item)
+    normalized = normalize(item)
+    @denormalize[normalized] = item
+    @items.index(item)
+  end
+
+  def calculate_grams_for(string, id)
+    string.ngram(NGRAM_SIZE).each do |gram|
+      @index[gram] = (@index[gram] || []).push(id)
+    end
   end
 end
