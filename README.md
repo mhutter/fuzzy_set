@@ -11,6 +11,15 @@ FuzzySet represents a set which allows searching its entries by using [Approxima
 
 It allows you to create a fuzzy-search!
 
+## How does it work?
+
+When `add`ing an element to the Set, it first gets indexed. This is, on a very basic level, cutting it up into ngrams and building an index with each ngram pointing to the element.
+
+If you then query the set with `get`, the query itself is also sliced into ngrams. We then select all elements in the set which share at least one common ngram with the query. The results are then ordered by their [cosine string similarity](https://github.com/mhutter/string-similarity) to the query.
+
+**TODO**:
+See [Issues labeled #feature](https://github.com/mhutter/fuzzy_set/labels/feature)
+
 ## Installation
 
 Add this line to your application's Gemfile:
