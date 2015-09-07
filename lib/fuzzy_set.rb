@@ -7,12 +7,17 @@ require 'core_ext/string'
 #
 # As a set, it cannot contain duplicate elements.
 class FuzzySet
-  NGRAM_SIZE = 3
+  NGRAM_SIZE_MAX = 3
+  NGRAM_SIZE_MIN = 2
 
-  def initialize(*items)
+  # @param items [#each,#to_s] item(s) to add
+  # @param all_matches [Boolean]
+  #   return all matches, even if an exact match is found
+  def initialize(*items, all_matches: false)
     @items = []
     @denormalize = {}
     @index = {}
+    @all_matches = all_matches
 
     add(items)
   end
@@ -29,7 +34,7 @@ class FuzzySet
   #
   # Each item will be converted into a string and indexed upon adding.
   #
-  # @param items [#to_s] item(s) to add
+  # @param items [#each,#to_s] item(s) to add
   # @return [FuzzySet] +self+
   def add(*items)
     items = [items].flatten
@@ -56,17 +61,15 @@ class FuzzySet
   # 4. sort matches by their cosine similarity to +query+
   #
   # @param query [String] search query
-  # @param all_matches [Boolean]
-  #   return all matches, even if an exact match is found
-  def get(query, all_matches: false)
+  def get(query)
     query = normalize(query)
 
     # check for exact match
-    unless all_matches
+    unless @all_matches
       return [@denormalize[query]] if @denormalize[query]
     end
 
-    match_ids = query.ngram(NGRAM_SIZE).map { |ng| @index[ng] }
+    match_ids = matches_for(query)
     match_ids = match_ids.flatten.compact.uniq
     matches = match_ids.map { |id| @items[id] }
 
@@ -92,6 +95,14 @@ class FuzzySet
 
   private
 
+  def matches_for(query)
+    NGRAM_SIZE_MAX.downto(NGRAM_SIZE_MIN).each do |size|
+      match_ids = query.ngram(size).map { |ng| @index[ng] }
+      return match_ids if match_ids.any?
+    end
+    []
+  end
+
   # Normalize a string by removing all non-word characters
   # except spaces and then converting it to lowercase.
   def normalize(str)
@@ -105,9 +116,12 @@ class FuzzySet
     @items.index(item)
   end
 
+  # calculate Ngrams and add them to the items
   def calculate_grams_for(string, id)
-    string.ngram(NGRAM_SIZE).each do |gram|
-      @index[gram] = (@index[gram] || []).push(id)
+    NGRAM_SIZE_MAX.downto(NGRAM_SIZE_MIN).each do |size|
+      string.ngram(size).each do |gram|
+        @index[gram] = (@index[gram] || []).push(id)
+      end
     end
   end
 end

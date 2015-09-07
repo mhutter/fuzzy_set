@@ -91,10 +91,17 @@ RSpec.describe FuzzySet do
     end
 
     it 'returns ALL matches if all_matches is true' do
+      fs = FuzzySet.new(all_matches: true)
       fs.add('foo', 'foobar')
-      result = fs.get('foo', all_matches: true)
+      result = fs.get('foo')
       expect(result.length).to eq 2
       expect(result).to include 'foobar'
+    end
+
+    it 'decrements ngram size if no matches are found' do
+      fs = FuzzySet.new('aaaaaaaabaaa')
+      # this query will not match with ngram sizes of 3
+      expect(fs.get('abba')).to eq ['aaaaaaaabaaa']
     end
   end
 
