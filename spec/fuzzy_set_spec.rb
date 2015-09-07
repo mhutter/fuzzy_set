@@ -65,7 +65,7 @@ RSpec.describe FuzzySet do
   context '#get' do
     it 'finds stuff' do
       fs.add(*states)
-      expect(fs.get('mischigen')).to include *['Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Wisconsin']
+      expect(fs.get('mischigen')).to include(*['Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Wisconsin'])
     end
 
     it 'returns an empty array if no matches are found' do
@@ -75,6 +75,13 @@ RSpec.describe FuzzySet do
     it 'sorts results by similarity to query' do
       fs.add(*states)
       expect(fs.get('missipissi')).to eq ['Mississippi', 'Missouri', 'Michigan', 'Minnesota']
+    end
+
+    it 'returns ALL matches if all_matches is true' do
+      fs.add('foo', 'foobar')
+      result = fs.get('foo', all_matches: true)
+      expect(result.length).to eq 2
+      expect(result).to include 'foobar'
     end
   end
 

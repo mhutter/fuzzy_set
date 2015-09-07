@@ -53,11 +53,17 @@ class FuzzySet
   # 2. check for an exact match and return, if present
   # 3. find matches based on Ngrams
   # 4. sort matches by their cosine similarity to +query+
-  def get(query)
+  #
+  # @param query [String] search query
+  # @param all_matches [Boolean]
+  #   return all matches, even if an exact match is found
+  def get(query, all_matches: false)
     query = normalize(query)
 
     # check for exact match
-    return [@denormalize[query]] if @denormalize[query]
+    unless all_matches
+      return [@denormalize[query]] if @denormalize[query]
+    end
 
     match_ids = query.ngram(NGRAM_SIZE).map { |ng| @index[ng] }
     match_ids = match_ids.flatten.compact.uniq
