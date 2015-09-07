@@ -1,28 +1,41 @@
 RSpec.describe FuzzySet do
   let(:fs) { FuzzySet.new }
+  let(:words) { %w(foo bar baz) }
 
   it 'has a version' do
     expect(FuzzySet::VERSION).to_not be_nil
   end
 
-  it '#new takes initial elements' do
-    set = FuzzySet.new('foo', 'bar')
-    expect(set).to_not be_empty
-    expect(set.length).to eq 2
+  context '#new' do
+    it 'takes initial elements' do
+      set = FuzzySet.new('foo', 'bar', 'baz')
+      expect(set.length).to eq 3
+      expect(set).to include(*words)
+    end
+
+    it 'takes an array' do
+      set = FuzzySet.new(words)
+      expect(set.length).to eq words.length
+      expect(set).to include(*words)
+    end
   end
 
   context '#add' do
     it 'adds single items' do
-      %w(foo bar baz).each do |word|
+      words.each do |word|
         fs.add word
         expect(fs).to include word
       end
     end
 
+    it 'lets me add an array' do
+      fs.add words
+      expect(fs).to include(*words)
+    end
+
     it 'adds multiple items' do
       fs.add('foo', 'bar', 'baz')
-      %w(foo bar baz).each { |word| expect(fs).to include word }
-      expect(fs.length).to eq 3
+      expect(fs).to include(*words)
     end
 
     it 'does not add duplicates' do

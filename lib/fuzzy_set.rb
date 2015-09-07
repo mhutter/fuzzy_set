@@ -14,7 +14,7 @@ class FuzzySet
     @denormalize = {}
     @index = {}
 
-    add(*items)
+    add(items)
   end
 
   # Normalizes +query+, and looks up an entry by its normalized value.
@@ -32,6 +32,7 @@ class FuzzySet
   # @param items [#to_s] item(s) to add
   # @return [FuzzySet] +self+
   def add(*items)
+    items = [items].flatten
     items.each do |item|
       item = item.to_s
       return self if @items.include?(item)
