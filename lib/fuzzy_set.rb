@@ -1,7 +1,6 @@
 require 'string/similarity'
 
 require 'fuzzy_set/version'
-require 'core_ext/string'
 
 # FuzzySet implements a fuzzy-searchable set of strings.
 #
@@ -106,7 +105,7 @@ class FuzzySet
 
   def matches_for(query)
     @ngram_size_max.downto(@ngram_size_min).each do |size|
-      match_ids = query.ngram(size).map { |ng| @index[ng] }
+      match_ids = ngram(query, size).map { |ng| @index[ng] }
       return match_ids if match_ids.any?
     end
     []
@@ -128,9 +127,22 @@ class FuzzySet
   # calculate Ngrams and add them to the items
   def calculate_grams_for(string, id)
     @ngram_size_max.downto(@ngram_size_min).each do |size|
-      string.ngram(size).each do |gram|
+      ngram(string, size).each do |gram|
         @index[gram] = (@index[gram] || []).push(id)
       end
+    end
+  end
+
+  # break apart the string into strings of length `n`
+  #
+  # @example
+  #     'foobar'.ngram(3)
+  #     # => ["-fo", "foo", "oob", "oba", "bar", "ar-"]
+  def ngram(str, n)
+    fail ArgumentError, "n must be >= 1, is #{n}" if n < 1
+    str = "-#{str}-" if n > 1
+    (str.length - n + 1).times.map do |i|
+      str.slice(i, n)
     end
   end
 end

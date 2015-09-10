@@ -40,16 +40,45 @@ Or install it yourself as:
 
 ```ruby
 require 'fuzzy_set'
-
 states = open('states.txt').read.split(/\n/)
-fs = FuzzySet.new(*states)
 
+# Create a new set and add some elements:
+fs = FuzzySet.new
+fs.add 'Some'
+fs.add 'Words'
+fs.add "or", "even", "multiple", "words!"
+
+# Or provide your elements when creating the set:
+fs = FuzzySet.new(states)
+
+# Use #exact_match to find exact matches (= the normalized query
+# matches a normalized element in the set):
 fs.exact_match('michigan!') # => "Michigan"
 fs.exact_match('mischigen') # => nil
 
+# Use #get to get all approximate matches:
 fs.get('mischigen')
 # => ["Michigan", "Wisconsin", "Mississippi", "Minnesota", "Missouri"]
+
+# With the default settings, #get will always first try to get an
+# exact match (see above), and return if there is one:
+fs.get('mississippi') # => ["Mississippi"]
+
+# set `all_matches` to true, to do a full query, even if there is
+# an exact match:
+fs = FuzzySet.new(states, all_matches: true)
+fs.get('mississippi') # => ["Mississippi", "Missouri", "Michigan", "Minnesota"]
+
+# You can configure more stuff (see below)
+fs = FuzzySet.new(states, all_matches: true, ngram_size_min: 1)
 ```
+
+### Options
+
+- `:all_matches` - If `false` and there is an exact match for `#get`, return the match immediately. If `true`, do the ngram-query to get more possible matches.
+- `:ngram_size_max` - The maximum Ngram size to use (if there is no match using the max ngram size, try again with a smaller ngran size).
+- `:ngram_size_min` - The minimum Ngram size to use.
+
 
 ## Development
 

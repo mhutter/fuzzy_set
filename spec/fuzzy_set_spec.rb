@@ -109,6 +109,11 @@ RSpec.describe FuzzySet do
       # this query will not match with ngram sizes of 3
       expect(fs.get('abba')).to eq ['aaaaaaaabaaa']
     end
+
+    it 'does not match everything when using ngram_size_min: 1' do
+      fs = FuzzySet.new(%w(aaa bbb ccc), ngram_size_min: 1)
+      expect(fs.get('zzz')).to be_empty
+    end
   end
 
 
