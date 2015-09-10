@@ -18,6 +18,12 @@ RSpec.describe FuzzySet do
       expect(set.length).to eq words.length
       expect(set).to include(*words)
     end
+
+    it 'lets you configre ngram_sizes' do
+      fs = FuzzySet.new('xxxaxxx', ngram_size_min: 1)
+      # this won't match with a ngram_size_min > 1
+      expect(fs.get('a')).to_not be_empty
+    end
   end
 
   context '#add' do

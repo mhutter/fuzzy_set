@@ -5,7 +5,7 @@ class String
   #     'foobar'.ngram(3)
   #     # => ["-fo", "foo", "oob", "oba", "bar", "ar-"]
   def ngram(n)
-    fail ArgumentError, "n must be > 1, is #{n}" if n < 2
+    fail ArgumentError, "n must be >= 1, is #{n}" if n < 1
     str = "-#{self}-"
     (str.length - n + 1).times.map do |i|
       str.slice(i, n)

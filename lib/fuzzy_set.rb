@@ -7,17 +7,28 @@ require 'core_ext/string'
 #
 # As a set, it cannot contain duplicate elements.
 class FuzzySet
-  NGRAM_SIZE_MAX = 3
-  NGRAM_SIZE_MIN = 2
+  # default options for creating new instances
+  DEFAULT_OPTS = {
+    all_matches: false,
+    ngram_size_max: 3,
+    ngram_size_min: 2
+  }
 
   # @param items [#each,#to_s] item(s) to add
-  # @param all_matches [Boolean]
+  # @param opts [Hash] options, see {DEFAULT_OPTS}
+  # @option opts [Boolean] :all_matches
   #   return all matches, even if an exact match is found
-  def initialize(*items, all_matches: false)
+  # @option opts [Fixnum] :ngram_size_max upper limit for ngram sizes
+  # @option opts [Fixnum] :ngram_size_min lower limit for ngram sizes
+  def initialize(*items, **opts)
+    opts = DEFAULT_OPTS.merge(opts)
+
     @items = []
     @denormalize = {}
     @index = {}
-    @all_matches = all_matches
+    @all_matches = opts[:all_matches]
+    @ngram_size_max = opts[:ngram_size_max]
+    @ngram_size_min = opts[:ngram_size_min]
 
     add(items)
   end
@@ -65,9 +76,7 @@ class FuzzySet
     query = normalize(query)
 
     # check for exact match
-    unless @all_matches
-      return [@denormalize[query]] if @denormalize[query]
-    end
+    return [@denormalize[query]] if !@all_matches && @denormalize[query]
 
     match_ids = matches_for(query)
     match_ids = match_ids.flatten.compact.uniq
@@ -96,7 +105,7 @@ class FuzzySet
   private
 
   def matches_for(query)
-    NGRAM_SIZE_MAX.downto(NGRAM_SIZE_MIN).each do |size|
+    @ngram_size_max.downto(@ngram_size_min).each do |size|
       match_ids = query.ngram(size).map { |ng| @index[ng] }
       return match_ids if match_ids.any?
     end
@@ -118,7 +127,7 @@ class FuzzySet
 
   # calculate Ngrams and add them to the items
   def calculate_grams_for(string, id)
-    NGRAM_SIZE_MAX.downto(NGRAM_SIZE_MIN).each do |size|
+    @ngram_size_max.downto(@ngram_size_min).each do |size|
       string.ngram(size).each do |gram|
         @index[gram] = (@index[gram] || []).push(id)
       end
