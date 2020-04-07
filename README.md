@@ -4,7 +4,6 @@
 [![Documentation](http://img.shields.io/badge/docs-rdoc.info-blue.svg)](http://rubydoc.org/gems/fuzzy_set/frames)
 [![Build Status](https://travis-ci.org/mhutter/fuzzy_set.svg)](https://travis-ci.org/mhutter/fuzzy_set)
 [![Code Climate](https://codeclimate.com/github/mhutter/fuzzy_set/badges/gpa.svg)](https://codeclimate.com/github/mhutter/fuzzy_set)
-[![Test Coverage](https://codeclimate.com/github/mhutter/fuzzy_set/badges/coverage.svg)](https://codeclimate.com/github/mhutter/fuzzy_set/coverage)
 
 
 FuzzySet represents a set which allows searching its entries by using [Approximate string matching](https://en.wikipedia.org/wiki/Approximate_string_matching).
